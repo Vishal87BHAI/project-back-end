@@ -1,15 +1,74 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors')
 require('./db/configr');
-const Uuser=require('./db/User')
+const User = require('./db/User');
+const Teacher = require('./db/teacher');
+const Student = require('./db/student');
+const teacher = require('./db/teacher');
 const app = express();
-app.use(express.json());
 
-app.post('/regst',async (req,resp)=>{
-    let user=new Uuser(req.body);
-    let result=await user.save();
+app.use(express.json());
+app.use(cors());
+
+app.post('/login', async (req, resp) => {
+    if (req.body.email && req.body.password) {
+        let user = await User.findOne(req.body);
+        if (user) {
+            resp.send(user);
+        }
+        else {
+            resp.send("user not found");
+        }
+    }
+    else {
+        resp.send("user not found");
+    }
+})
+
+app.post('/teacher', async (req, resp) => {
+    let teacher = new Teacher(req.body);
+    let result = await teacher.save();
     resp.send(result);
 })
+
+app.get('/getteacher', async (req, resp) => {
+    let teachers = await Teacher.find();
+    resp.send(teachers);
+})
+
+app.delete('/teacher/:id', async (req, resp) => {
+    const result = await Teacher.deleteOne({ _id: req.params.id });
+    resp.send(result);
+})
+
+app.get('/getteacher/:id', async (req, resp) => {
+    let result = await Teacher.findOne({ _id: req.params.id });
+    if (result) {
+        resp.send(result);
+    }
+    else {
+        resp.send({ result: "no result found" });
+    }
+})
+
+app.put('/teacher/:id', async (req, resp) => {
+    let result = await Teacher.updateOne(
+        { _id: req.params.id },
+        {
+            $set: req.body
+        }
+    )
+    resp.send(result);
+})
+
+app.post('/student', async (req, resp) => {
+    let student = new Student(req.body);
+    let result = await student.save();
+    resp.send(result);
+})
+
+
 app.listen(9000);
 
 
