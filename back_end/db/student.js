@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const studentschema=new mongoose.Schema({
     name:String,
-    class:Number,
+    clas:Number,
     roll:Number,
     dob:{
         type:Date

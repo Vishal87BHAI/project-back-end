@@ -62,9 +62,69 @@ app.put('/teacher/:id', async (req, resp) => {
     resp.send(result);
 })
 
+app.get('/search/:key', async (req, resp) => {
+    let result = await Teacher.find({
+        "$or": [
+            { name: { $regex: req.params.key } },
+            { id: { $regex: req.params.key } },
+            { subject: { $regex: req.params.key } },
+            { dob: { $regex: req.params.key } },
+            { age: { $regex: req.params.key } },
+            { gender: { $regex: req.params.key } }
+        ]
+    });
+    resp.send(result);
+})
+
+
+
+app.get('/getstudent', async (req, resp) => {
+    let students = await Student.find();
+    resp.send(students);
+})
+
 app.post('/student', async (req, resp) => {
     let student = new Student(req.body);
     let result = await student.save();
+    resp.send(result);
+})
+
+app.delete('/student/:id', async (req, resp) => {
+    const result = await Student.deleteOne({ _id: req.params.id });
+    resp.send(result);
+})
+
+app.get('/getstudent/:id', async (req, resp) => {
+    let result = await Student.findOne({ _id: req.params.id });
+    if (result) {
+        resp.send(result);
+    }
+    else {
+        resp.send({ result: "no result found" });
+    }
+})
+
+app.put('/student/:id', async (req, resp) => {
+    let result = await Student.updateOne(
+        { _id: req.params.id },
+        {
+            $set: req.body
+        }
+    )
+    resp.send(result);
+})
+
+app.get('/search/:key', async (req, resp) => {
+    let result = await Student.find({
+        "$or": [
+            { name: { $regex: req.params.key } },
+            { id: { $regex: req.params.key } },
+            { subject: { $regex: req.params.key } },
+            { dob: { $regex: req.params.key } },
+            { age: { $regex: req.params.key } },
+            { gender: { $regex: req.params.key } }
+        ]
+    });
     resp.send(result);
 })
 
