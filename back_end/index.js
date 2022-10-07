@@ -18,11 +18,11 @@ app.post('/login', async (req, resp) => {
             resp.send(user);
         }
         else {
-            resp.send("user not found");
+            resp.send({error: "user not found"});
         }
     }
     else {
-        resp.send("user not found");
+        resp.send({error: "user not found"});
     }
 })
 
