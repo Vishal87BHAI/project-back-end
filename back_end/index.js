@@ -13,7 +13,7 @@ app.use(cors());
 
 app.post('/login', async (req, resp) => {
     if (req.body.email && req.body.password) {
-        let user = await User.findOne(req.body);
+        let user = await User.findOne(req.body).select("-password");
         if (user) {
             resp.send(user);
         }
