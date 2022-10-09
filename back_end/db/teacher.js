@@ -6,15 +6,8 @@ const teacherschema=new mongoose.Schema({
     name:String,
     id:Number,
     subject:String,
-    dob:{
-        type:Date
-    },
+    dob:Date,
     age:String,
-    img:
-    {
-        data: Buffer,
-        contentType: String
-    },
     gender:String
 })
 
