@@ -65,12 +65,12 @@ app.put('/teacher/:id', async (req, resp) => {
 app.get('/search/:key', async (req, resp) => {
     let result = await Teacher.find({
         "$or": [
-            { name: { $regex: req.params.key } },
-            { id: { $regex: req.params.key } },
-            { subject: { $regex: req.params.key } },
-            { dob: { $regex: req.params.key } },
-            { age: { $regex: req.params.key } },
-            { gender: { $regex: req.params.key } }
+            { name: { $text: req.params.key } },
+            { id: { $text: req.params.key } },
+            { subject: { $text: req.params.key } },
+            { dob: { $text: req.params.key } },
+            { age: { $text: req.params.key } },
+            { gender: { $text: req.params.key } }
         ]
     });
     resp.send(result);
@@ -117,12 +117,12 @@ app.put('/student/:id', async (req, resp) => {
 app.get('/search/:key', async (req, resp) => {
     let result = await Student.find({
         "$or": [
-            { name: { $regex: req.params.key } },
-            { id: { $regex: req.params.key } },
-            { subject: { $regex: req.params.key } },
-            { dob: { $regex: req.params.key } },
-            { age: { $regex: req.params.key } },
-            { gender: { $regex: req.params.key } }
+            { name: { $text: req.params.key } },
+            { id: { $text: req.params.key } },
+            { subject: { $text: req.params.key } },
+            { dob: { $text: req.params.key } },
+            { age: { $text: req.params.key } },
+            { gender: { $text: req.params.key } }
         ]
     });
     resp.send(result);
