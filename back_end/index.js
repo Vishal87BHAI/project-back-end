@@ -138,7 +138,7 @@ app.get('/search/:key',verifytoken, async (req, resp) => {
 
 function verifytoken(req,resp,next)
 {
-    let token=req.headers['authorization'];
+    let token=req.headers['Authorization'];
     if(token)
     {
         token=token.split(' ')[1];
