@@ -6,6 +6,8 @@ const User = require('./db/User');
 const Teacher = require('./db/teacher');
 const Student = require('./db/student');
 const teacher = require('./db/teacher');
+const jwt=require('jsonwebtoken');
+const jwtkey=('school');
 const app = express();
 
 app.use(express.json());
@@ -15,7 +17,13 @@ app.post('/login', async (req, resp) => {
     if (req.body.email && req.body.password) {
         let user = await User.findOne(req.body).select("-password");
         if (user) {
-            resp.send(user);
+            jwt.sign({user},jwtkey,{expiresIn:"2h"},(err,token)=>{
+                if(err)
+                {
+                    resp.send({result:"Something went wrong"})
+                }
+                resp.send({user,auth:token})
+            })
         }
         else {
             resp.send({ error: "user not found" });
@@ -26,23 +34,23 @@ app.post('/login', async (req, resp) => {
     }
 })
 
-app.post('/teacher', async (req, resp) => {
+app.post('/teacher',verifytoken, async (req, resp) => {
     let teacher = new Teacher(req.body);
     let result = await teacher.save();
     resp.send(result);
 })
 
-app.get('/getteacher', async (req, resp) => {
+app.get('/getteacher',verifytoken, async (req, resp) => {
     let teachers = await Teacher.find();
     resp.send(teachers);
 })
 
-app.delete('/teacher/:id', async (req, resp) => {
+app.delete('/teacher/:id',verifytoken, async (req, resp) => {
     const result = await Teacher.deleteOne({ _id: req.params.id });
     resp.send(result);
 })
 
-app.get('/getteacher/:id', async (req, resp) => {
+app.get('/getteacher/:id',verifytoken, async (req, resp) => {
     let result = await Teacher.findOne({ _id: req.params.id });
     if (result) {
         resp.send(result);
@@ -52,7 +60,7 @@ app.get('/getteacher/:id', async (req, resp) => {
     }
 })
 
-app.put('/teacher/:id', async (req, resp) => {
+app.put('/teacher/:id',verifytoken, async (req, resp) => {
     let result = await Teacher.updateOne(
         { _id: req.params.id },
         {
@@ -62,7 +70,7 @@ app.put('/teacher/:id', async (req, resp) => {
     resp.send(result);
 })
 
-app.get('/search/:key', async (req, resp) => {
+app.get('/search/:key',verifytoken, async (req, resp) => {
     let result = await Teacher.find({
         "$or": [
             { name: { $regex: req.params.key } },
@@ -78,23 +86,23 @@ app.get('/search/:key', async (req, resp) => {
 
 
 
-app.get('/getstudent', async (req, resp) => {
+app.get('/getstudent',verifytoken, async (req, resp) => {
     let students = await Student.find();
     resp.send(students);
 })
 
-app.post('/student', async (req, resp) => {
+app.post('/student',verifytoken, async (req, resp) => {
     let student = new Student(req.body);
     let result = await student.save();
     resp.send(result);
 })
 
-app.delete('/student/:id', async (req, resp) => {
+app.delete('/student/:id',verifytoken, async (req, resp) => {
     const result = await Student.deleteOne({ _id: req.params.id });
     resp.send(result);
 })
 
-app.get('/getstudent/:id', async (req, resp) => {
+app.get('/getstudent/:id',verifytoken, async (req, resp) => {
     let result = await Student.findOne({ _id: req.params.id });
     if (result) {
         resp.send(result);
@@ -104,7 +112,7 @@ app.get('/getstudent/:id', async (req, resp) => {
     }
 })
 
-app.put('/student/:id', async (req, resp) => {
+app.put('/student/:id',verifytoken, async (req, resp) => {
     let result = await Student.updateOne(
         { _id: req.params.id },
         {
@@ -114,7 +122,7 @@ app.put('/student/:id', async (req, resp) => {
     resp.send(result);
 })
 
-app.get('/search/:key', async (req, resp) => {
+app.get('/search/:key',verifytoken, async (req, resp) => {
     let result = await Student.find({
         "$or": [
             { name: { $regex: req.params.key } },
@@ -127,6 +135,28 @@ app.get('/search/:key', async (req, resp) => {
     });
     resp.send(result);
 })
+
+function verifytoken(req,resp,next)
+{
+    let token=req.headers['authorization'];
+    if(token)
+    {
+        token=token.split(' ')[1];
+        jwt.verify(token,jwtkey,(err,valid)=>{
+            if(err)
+            {
+                resp.send({result:"Please provide valid token"});
+            }
+            else{
+                next();
+            }
+        })
+    }
+    else
+    {
+        resp.send({result:"Please provide token with header"});
+    }
+}
 
 
 app.listen(9000);
