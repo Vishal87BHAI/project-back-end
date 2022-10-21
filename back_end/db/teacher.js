@@ -6,7 +6,8 @@ const teacherschema=new mongoose.Schema({
     name:String,
     id:Number,
     subject:String,
-    dob:Date,
+    dob:String,
+    age:Number,
     gender:String
 })
 
