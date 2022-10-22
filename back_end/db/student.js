@@ -4,9 +4,7 @@ const studentschema=new mongoose.Schema({
     name:String,
     clas:Number,
     roll:Number,
-    dob:{
-        type:Date
-    },
+    dob:String,
     age:Number,
     gender:String
 })
