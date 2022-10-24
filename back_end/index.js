@@ -81,14 +81,17 @@ app.put('/teacher/:id', verifytoken, async (req, resp) => {
 })
 
 app.get('/search/:key', verifytoken, async (req, resp) => {
+    let keys=req.params.key;
+    console.log(keys)
     let result = await Teacher.find({
         "$or": [
-            { name: { $regex: req.params.key } },
-            { id: { $regex: req.params.key } },
-            { subject: { $regex: req.params.key } },
-            { dob: { $regex: req.params.key } },
-            { age: { $regex: req.params.key } },
-            { gender: { $regex: req.params.key } }
+            { name: { $regex: keys } },
+            { id: { $regex: keys } },
+            { subject: { $regex: keys } },
+            { dob: { $regex: keys } },
+            { age: { $regex: keys } },
+            { gender: { $regex: keys } }
+            
         ]
     });
     resp.send(result);
