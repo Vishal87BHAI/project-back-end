@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors')
+const cors = require('cors');
+const multer = require('multer');
+const fs = require('fs');
 require('./db/configr');
 const User = require('./db/User');
 const Teacher = require('./db/teacher');
@@ -11,15 +13,36 @@ const jwtkey = ('school');
 const app = express();
 var ageCalculator = require('age-calculator');
 let { AgeFromDateString, AgeFromDate } = require('age-calculator');
+const { log } = require('console');
+
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads')
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + "--" + file.originalname)
+    }
+})
+
+const upload = multer({ storage: storage });
+
 
 app.use(express.json());
 app.use(cors());
+
+// app.post('/hello',upload.single(),async(req,resp)=>{
+
+    
+//     resp.send("done")
+
+// })
 
 app.post('/login', async (req, resp) => {
     if (req.body.email && req.body.password) {
         let user = await User.findOne(req.body).select("-password");
         if (user) {
-            jwt.sign({ user }, jwtkey, { expiresIn: "2h" }, (err, token) => {
+            jwt.sign({ user }, jwtkey, { expiresIn: "24h" }, (err, token) => {
                 if (err) {
                     resp.send({ result: "Something went wrong" })
                 }
@@ -35,16 +58,17 @@ app.post('/login', async (req, resp) => {
     }
 })
 
-app.post('/teacher', verifytoken, async (req, resp) => {
+app.post('/teacher', verifytoken, upload.single("test"), async (req, resp) => {
+    console.log(req.file);
     let teacher = new Teacher({
         _id: new mongoose.Types.ObjectId,
         name: req.body.name,
         id: req.body.id,
-        subject: req.body.subject,
+        subject: req.body.subject,  
         dob: req.body.dob,
         age: findage(req.body.dob),
+        img: req.file.filename ,
         gender: req.body.gender
-
     });
     let result = await teacher.save();
     resp.send(result);
@@ -84,10 +108,10 @@ app.get('/search/:key', verifytoken, async (req, resp) => {
     let result = await Teacher.find({
         "$or": [
             { name: { $regex: req.params.key } },
-            { id: { $regex: req.params.key } },
+            //{ id: { $regex: req.params.key } },
             { subject: { $regex: req.params.key } },
-            { dob: { $regex: req.params.key } },
-            { age: { $regex: req.params.key } },
+            //{ dob: { $regex: req.params.key } },
+            //{ age: { $regex: req.params.key } },
             { gender: { $regex: req.params.key } }
         ]
     });
@@ -145,10 +169,10 @@ app.get('/search/:key', verifytoken, async (req, resp) => {
     let result = await Student.find({
         "$or": [
             { name: { $regex: req.params.key } },
-            { id: { $regex: req.params.key } },
-            { subject: { $regex: req.params.key } },
-            { dob: { $regex: req.params.key } },
-            { age: { $regex: req.params.key } },
+            //{ clas: { $regex: req.params.key } },
+            //{ roll: { $regex: req.params.key } },
+            //{ dob: { $regex: req.params.key } },
+            //{ age: { $regex: req.params.key } },
             { gender: { $regex: req.params.key } }
         ]
     });
@@ -178,7 +202,6 @@ function findage(a) {
     return ageFromDate;
 
 }
-
 
 app.listen(9000);
 
