@@ -38,6 +38,10 @@ app.use(cors());
 
 // })
 
+app.get('/', async (req, resp) => {
+    resp.send('hello ji! connect ho gya.');
+})
+
 app.post('/login', async (req, resp) => {
     if (req.body.email && req.body.password) {
         let user = await User.findOne(req.body).select("-password");
@@ -204,6 +208,8 @@ function findage(a) {
 }
 
 app.listen(9000);
+
+module.exports = app;
 
 
 
